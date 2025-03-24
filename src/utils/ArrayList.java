@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -16,7 +17,8 @@ import java.util.Objects;
  */
 
 
-public abstract class ArrayList<E> implements List<E> {
+public abstract class ArrayList<E> implements List<E>, Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * The default initial capacity of the list when no capacity is specified.
      */
@@ -65,13 +67,14 @@ public abstract class ArrayList<E> implements List<E> {
      * @param otherList the list whose elements are to be copied
      * @throws NullPointerException if the specified list is {@code null}
      */
-    public ArrayList(List<E> otherList) {
+    public ArrayList(java.util.List<? extends E> otherList) {
         this(otherList.size());
-        addAll(otherList);
+        for (E item : otherList){
+            add(item);
+        }
     }
 
-    public <E> ArrayList(java.util.List<E> otherList) {
-    }
+
 
 
 
@@ -230,25 +233,37 @@ public abstract class ArrayList<E> implements List<E> {
     }
 
 
+    /**
+     * Removes the element at the specified position in the list.
+     * Shifts any subsequent elements to the left (subtracts one from their indices).
+     *
+     * @return the element that was removed
+     * @throws IndexOutOfBoundsException if the index is out of range (less than 0 or greater than/equal to size)
+     */
+
+    public boolean remove() {
+        return remove(null);
+    }
 
     /**
      * Removes the element at the specified position in the list.
      * Shifts any subsequent elements to the left (subtracts one from their indices).
      *
-     * @param index the index of the element to be removed
+     * @param item the index of the element to be removed
      * @return the element that was removed
      * @throws IndexOutOfBoundsException if the index is out of range (less than 0 or greater than/equal to size)
      */
 
     @Override
-    public E remove(int index) {
-        validateIndex(index); // index validation
-        E removedItem = data[index];
-        System.arraycopy(data, index + 1, data, index, size - index - 1);
-        data[--size] = null; //
-        return removedItem;
+    public boolean remove(E item) {
+        for (int i = 0; i < size; i++) {
+            if (Objects.equals(data[i], item)) { // Handles null safely
+                remove(i);
+                return true;
+            }
+        }
+        return false;
     }
-
 
 
 
@@ -301,4 +316,31 @@ public abstract class ArrayList<E> implements List<E> {
         }
         return result.append("]").toString();
     }
+
+    public void sort(Comparator<? super E> comparator){
+        Arrays.sort(data, 0, size, comparator);
+    }
+
+    public void reverse(){
+        for (int i = 0; i < size / 2; i++){
+            E temp = data[i];
+            data[i] = data[size - 1 - i];
+            data[size - 1 - i] = temp;
+
+        }
+
+    }
+    @Override
+    public List<E> subList(int fromIndex, int toIndex) {
+        if (fromIndex < 0 || toIndex > size || fromIndex > toIndex) {
+            throw new IndexOutOfBoundsException("Invalid subList range.");
+        }
+        // Create a sublist backed by the original array
+        ArrayList<E> subList = new ArrayList<E>(toIndex - fromIndex);
+        for (int i = fromIndex; i < toIndex; i++) {
+            subList.add(data[i]);
+        }
+        return subList;
+    }
+
 }
