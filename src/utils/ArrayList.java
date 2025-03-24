@@ -5,7 +5,7 @@ import java.util.Arrays;
 // when I'm finished, this code should allow me to create and
 
 
-public class ArrayList<E> implements List<E> {
+public abstract class ArrayList<E> implements List<E> {
     private static final int STARTING_SPACE = 10;
     private E[] data;
     private int size;
@@ -15,17 +15,31 @@ public class ArrayList<E> implements List<E> {
         this(STARTING_SPACE);
 
     }
-
+    @SuppressWarnings("unchecked")
     public ArrayList(int space){
         data = (E[]) new Object[space];
         size = 0;
 
     }
-    private void ensureSpace(){
+    public void ensureSpace(){
         if (size == data.length){
+            if (data.length == Integer.MAX_VALUE){
+                throw new OutOfMemoryError("cannot allocate more space for the list.");
+            }
+            int newSize = Math.min(data.length * 2, Integer.MAX_VALUE);
             data = Arrays.copyOf(data, data.length * 2);
 
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            result.append(data[i]);
+            if (i < size - 1) result.append(", ");
+        }
+        return result.append("]").toString();
     }
 
     public ArrayList(List<E> otherList) {
@@ -44,6 +58,7 @@ public class ArrayList<E> implements List<E> {
         size++;
     }
 
+
     @Override
     public boolean add(E item){
         ensureSpace();
@@ -54,6 +69,9 @@ public class ArrayList<E> implements List<E> {
     // to add all from another list
     @Override
     public boolean addAll(List<E> otherList){
+        if (otherList == null) {
+            throw new NullPointerException("Provided list cannot be null");
+        }
         for(int i = 0; i < otherList.size(); i++){
             add(otherList.get(i));
 
@@ -63,6 +81,9 @@ public class ArrayList<E> implements List<E> {
 
     @Override
     public void clear() {
+        for (int i = 0; i < size; i++){
+            data[i] = null;
+        }
         data = (E[]) new Object[STARTING_SPACE];
         size = 0;
 
@@ -83,14 +104,14 @@ public class ArrayList<E> implements List<E> {
     @Override
     public int indexOf(E item) {
         for (int i = 0; i < size; i++){
-            if (data[i].equals(item)) {
+            if (item == null ? data[i] == null : data[i].equals(item)) {
                 return i;
             }
         }
         return -1;
     }
 
-    @Override
+
     public boolean isEmpty() {
         return size == 0;
     }
@@ -105,15 +126,18 @@ public class ArrayList<E> implements List<E> {
     }
     // to remove first iteration of an item
     @Override
-    public boolean remove(E item) {
+    public E removeFirst(E item) {
         int index = indexOf(item);
-        if (index == -1) return false;
-        remove(index);
-        return true;
+        if (index == -1) return null;
+        return remove(index);
+    }
+
+    public boolean removeAll(List<E> otherList){
+
     }
 
 
-    @Override
+
     public E set(int index, E item) {
         if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
         E prevItem = data[index];
@@ -121,7 +145,7 @@ public class ArrayList<E> implements List<E> {
         return prevItem;
     }
 
-    @Override
+
     public int size() {
         return size;
     }

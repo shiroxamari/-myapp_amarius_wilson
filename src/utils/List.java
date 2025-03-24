@@ -28,7 +28,7 @@ public interface List<E> {
         return get(size() - 1);
     }
 
-    default E removeFirst() {
+    default E removeFirst(E item) {
         return remove(0);
     }
 
