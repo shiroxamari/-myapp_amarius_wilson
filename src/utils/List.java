@@ -14,6 +14,12 @@ public interface List<E> {
     boolean removeAll(List<E> otherList);
     E set(int index, E item);
     int size();
+    List<E> subList(int fromIndex, int toIndex);
+    void sort(Comparator<? super E> comparator);
+    int lastIndexOf(E item);
+    Iterator<E> iterator();
+    boolean equals(Object obj);
+    int hashCode();
 
 
     // Default methods with some basic implementations
