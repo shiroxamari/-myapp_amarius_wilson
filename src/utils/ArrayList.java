@@ -1,17 +1,18 @@
 package utils;
 
 import java.util.Arrays;
+import java.util.List;
 
 // when I'm finished, this code should allow me to create and
 
 
-public abstract class ArrayList<E> implements List<E> {
+public abstract class CustomArrayList<E> implements List<E> {
     private static final int STARTING_SPACE = 10;
     private E[] data;
     private int size;
 
     // starting constructor
-    public ArrayList(){
+    public CustomArrayList(){
         this(STARTING_SPACE);
 
     }
@@ -21,13 +22,14 @@ public abstract class ArrayList<E> implements List<E> {
         size = 0;
 
     }
+    // method to make sure there is enough space in the array list to add more itemsj
     public void ensureSpace(){
         if (size == data.length){
             if (data.length == Integer.MAX_VALUE){
                 throw new OutOfMemoryError("cannot allocate more space for the list.");
             }
             int newSize = Math.min(data.length * 2, Integer.MAX_VALUE);
-            data = Arrays.copyOf(data, data.length * 2);
+            data = Arrays.copyOf(data, newSize);
 
         }
     }
@@ -42,11 +44,11 @@ public abstract class ArrayList<E> implements List<E> {
         return result.append("]").toString();
     }
 
-    public ArrayList(List<E> otherList) {
+    public CustomArrayList(List<E> otherList) {
         this(otherList.size());
         addAll(otherList);
     }
-    // method to make sure there is enough space in the array list to add more items
+
 
     // to add items at certain indexes
     @Override
@@ -72,14 +74,13 @@ public abstract class ArrayList<E> implements List<E> {
         if (otherList == null) {
             throw new NullPointerException("Provided list cannot be null");
         }
-        for(int i = 0; i < otherList.size(); i++){
+        for (int i = 0; i < otherList.size(); i++){
             add(otherList.get(i));
 
         }
         return true;
     }
 
-    @Override
     public void clear() {
         for (int i = 0; i < size; i++){
             data[i] = null;
@@ -89,7 +90,6 @@ public abstract class ArrayList<E> implements List<E> {
 
 
     }
-
     @Override
     public boolean contains(E item) {
         return indexOf(item) >= 0;
@@ -102,7 +102,7 @@ public abstract class ArrayList<E> implements List<E> {
     }
     // gives me the index of whichever item
     @Override
-    public int indexOf(E item) {
+    public int indexOf(Object item) {
         for (int i = 0; i < size; i++){
             if (item == null ? data[i] == null : data[i].equals(item)) {
                 return i;
@@ -125,17 +125,26 @@ public abstract class ArrayList<E> implements List<E> {
         return removedItem;
     }
     // to remove first iteration of an item
-    @Override
     public E removeFirst(E item) {
         int index = indexOf(item);
         if (index == -1) return null;
         return remove(index);
     }
 
-    public boolean removeAll(List<E> otherList){
-
+    public boolean removeAll(List<E> otherList) {
+        boolean modified = false;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < otherList.size(); j++) {
+                if (data[i] != null && data[i].equals(otherList.get(j))) {
+                    remove(i); // Remove the element at index i
+                    i--; // Adjust index after removal to prevent skipping elements
+                    modified = true;
+                    break; // Exit inner loop once an element is removed
+                }
+            }
+        }
+        return modified;
     }
-
 
 
     public E set(int index, E item) {
