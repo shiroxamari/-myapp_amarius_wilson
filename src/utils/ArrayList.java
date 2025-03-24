@@ -2,6 +2,9 @@ package utils;
 
 import java.util.Arrays;
 
+// when I'm finished, this code should allow me to create and
+
+
 public class ArrayList<E> implements List<E> {
     private static final int STARTING_SPACE = 10;
     private E[] data;
